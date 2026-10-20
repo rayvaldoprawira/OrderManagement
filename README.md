@@ -4,7 +4,7 @@ RESTful API untuk sistem Order Management dengan fokus utama pada **High Concurr
 
 ---
 
-## 📋 Daftar Isi
+## Daftar Isi
 1. [Arsitektur Proyek](#arsitektur-proyek)
 2. [Fitur Fungsional & Aturan Bisnis](#fitur-fungsional--aturan-bisnis)
 3. [Strategi Non-Fungsional (Concurrency & Idempotency)](#strategi-non-fungsional)
@@ -20,7 +20,7 @@ RESTful API untuk sistem Order Management dengan fokus utama pada **High Concurr
 
 ---
 
-## 🏛️ Arsitektur Proyek
+## Arsitektur Proyek
 
 Aplikasi ini dibangun menggunakan arsitektur modular **Clean Architecture**:
 
@@ -57,7 +57,7 @@ OrderManagement/
 
 ---
 
-## 🎯 Fitur Fungsional & Aturan Bisnis
+##  Fitur Fungsional & Aturan Bisnis
 
 1. **Create Order (`POST /api/orders`)**:
    - Menerima `customerId`, `shippingAddress`, dan daftar items (`productId`, `quantity`).
@@ -81,7 +81,7 @@ OrderManagement/
 
 ---
 
-## ⚡ Strategi Non-Fungsional
+##  Strategi Non-Fungsional
 
 ### 1. Idempotency Handling & Justifikasi
 - **Masalah:** User tidak sabar mengklik tombol "Submit" berulang kali, atau retry otomatis dari peramban/jaringan menyebabkan *double order*.
@@ -210,7 +210,7 @@ Mapping Status Code HTTP yang Tepat:
 
 ---
 
-## 🗄️ Persistensi Data & Skema Database
+##  Persistensi Data & Skema Database
 
 - **Database Engine:** Microsoft SQL Server (didukung melalui LocalDB bawaan Windows atau SQL Server Express/Standard).
 - **Alasan Pemilihan:**
@@ -222,7 +222,7 @@ Mapping Status Code HTTP yang Tepat:
 
 ---
 
-## 🚀 Prasyarat & Cara Menjalankan Aplikasi
+##  Prasyarat & Cara Menjalankan Aplikasi
 
 ### Prasyarat
 1. [.NET 10 SDK](https://dotnet.microsoft.com/) atau versi .NET terbaru.
@@ -296,7 +296,7 @@ Mapping Status Code HTTP yang Tepat:
 
 ---
 
-## 🧪 Automated Testing
+##  Automated Testing
 
 Proyek ini dilengkapi dengan **22 unit & concurrency tests** yang mencakup seluruh skenario wajib:
 
