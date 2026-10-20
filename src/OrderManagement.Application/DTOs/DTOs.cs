@@ -2,21 +2,39 @@ using OrderManagement.Domain.Enums;
 
 namespace OrderManagement.Application.DTOs;
 
+/// <summary>
+/// Item produk yang dipesan dalam order baru.
+/// </summary>
+/// <param name="ProductId">ID unik produk yang dipesan.</param>
+/// <param name="Quantity">Jumlah kuantitas yang dipesan (minimal 1).</param>
 public record CreateOrderItemRequest(
     Guid ProductId,
     int Quantity
 );
 
+/// <summary>
+/// Data permintaan pembuatan order baru.
+/// </summary>
+/// <param name="CustomerId">Identitas atau ID pelanggan pembuat pesanan.</param>
+/// <param name="ShippingAddress">Alamat tujuan pengiriman pesanan.</param>
+/// <param name="Items">Daftar item produk yang dipesan.</param>
 public record CreateOrderRequest(
     string CustomerId,
     string ShippingAddress,
     List<CreateOrderItemRequest> Items
 );
 
+/// <summary>
+/// Permintaan pembaruan status pesanan.
+/// </summary>
+/// <param name="Status">Status baru pesanan (Pending, Processing, Completed, Cancelled).</param>
 public record UpdateOrderStatusRequest(
     OrderStatus Status
 );
 
+/// <summary>
+/// Informasi detail item dalam pesanan.
+/// </summary>
 public record OrderItemResponse(
     Guid ProductId,
     string ProductName,
@@ -25,6 +43,9 @@ public record OrderItemResponse(
     decimal Subtotal
 );
 
+/// <summary>
+/// Informasi lengkap detail pesanan.
+/// </summary>
 public record OrderResponse(
     Guid Id,
     string CustomerId,
@@ -37,6 +58,9 @@ public record OrderResponse(
     List<OrderItemResponse> Items
 );
 
+/// <summary>
+/// Informasi master produk dan ketersediaan stok.
+/// </summary>
 public record ProductResponse(
     Guid Id,
     string Name,
@@ -44,12 +68,18 @@ public record ProductResponse(
     decimal Price
 );
 
+/// <summary>
+/// Data pembuatan master produk baru.
+/// </summary>
 public record CreateProductRequest(
     string Name,
     int StockQuantity,
     decimal Price
 );
 
+/// <summary>
+/// Kriteria filter dan pagination untuk daftar order.
+/// </summary>
 public record OrderListQuery(
     string? CustomerId = null,
     OrderStatus? Status = null,

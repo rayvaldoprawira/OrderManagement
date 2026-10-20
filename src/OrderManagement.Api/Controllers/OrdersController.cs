@@ -30,8 +30,11 @@ public class OrdersController : ControllerBase
         HttpContext.Items["CorrelationId"]?.ToString() ?? HttpContext.TraceIdentifier;
 
     /// <summary>
-    /// Creates a new order. Supports idempotency via the 'Idempotency-Key' HTTP header.
+    /// Membuat order baru. Mendukung idempotency via header 'Idempotency-Key' untuk mencegah double order.
     /// </summary>
+    /// <param name="request">Payload pesanan yang mencakup CustomerId, ShippingAddress, dan daftar item produk.</param>
+    /// <param name="idempotencyKey">UUID unik idempotency key pada header HTTP untuk mencegah double submit jika tombol diklik berulang kali.</param>
+    /// <param name="cancellationToken">Cancellation token pembatalan request.</param>
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<OrderResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
@@ -51,8 +54,10 @@ public class OrdersController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves order details by ID.
+    /// Mengambil detail informasi order berdasarkan Order ID.
     /// </summary>
+    /// <param name="id">ID unik (GUID) dari order.</param>
+    /// <param name="cancellationToken">Cancellation token pembatalan request.</param>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse<OrderResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
@@ -63,8 +68,10 @@ public class OrdersController : ControllerBase
     }
 
     /// <summary>
-    /// Lists orders with filtering (customerId, status, date range) and pagination.
+    /// Menampilkan daftar order dengan filter (customerId, status, rentang tanggal) dan pagination.
     /// </summary>
+    /// <param name="query">Kriteria query filter dan pagination (PageNumber, PageSize).</param>
+    /// <param name="cancellationToken">Cancellation token pembatalan request.</param>
     [HttpGet]
     [ProducesResponseType(typeof(ApiResponse<PagedResult<OrderResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
@@ -77,8 +84,11 @@ public class OrdersController : ControllerBase
     }
 
     /// <summary>
-    /// Updates the order status with state-machine transition checks and optimistic concurrency validation.
+    /// Memperbarui status order dengan validasi transisi status (state machine) dan optimistic concurrency check.
     /// </summary>
+    /// <param name="id">ID unik (GUID) dari order.</param>
+    /// <param name="request">Status baru pesanan (Pending -> Processing -> Completed/Cancelled).</param>
+    /// <param name="cancellationToken">Cancellation token pembatalan request.</param>
     [HttpPatch("{id:guid}/status")]
     [ProducesResponseType(typeof(ApiResponse<OrderResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
@@ -96,8 +106,10 @@ public class OrdersController : ControllerBase
     }
 
     /// <summary>
-    /// Cancels an order and automatically restores its inventory stock.
+    /// Membatalkan order dan secara otomatis mengembalikan stok barang ke inventory.
     /// </summary>
+    /// <param name="id">ID unik (GUID) dari order yang ingin dibatalkan.</param>
+    /// <param name="cancellationToken">Cancellation token pembatalan request.</param>
     [HttpPost("{id:guid}/cancel")]
     [ProducesResponseType(typeof(ApiResponse<OrderResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]

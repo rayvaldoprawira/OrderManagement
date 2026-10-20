@@ -1,11 +1,13 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 using OrderManagement.Api.Middleware;
 using OrderManagement.Application.Interfaces;
 using OrderManagement.Application.Validators;
 using OrderManagement.Infrastructure.Data;
 using OrderManagement.Infrastructure.Services;
 using Serilog;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,7 +46,36 @@ builder.Services.AddScoped<IIdempotencyService, IdempotencyService>();
 
 // Swagger / OpenAPI documentation
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Order Management REST API",
+        Version = "v1",
+        Description = "### Sistem Order Management & Inventory\n\n" +
+                      "Fitur Utama API:\n" +
+                      "- **Pencegahan Double Order**: Mendukung idempotency via header `Idempotency-Key` (UUID) pada pembuatan order.\n" +
+                      "- **Manajemen Stok Real-Time**: Validasi dan alokasi stok atomik untuk mencegah stok minus akibat concurrent orders.\n" +
+                      "- **Optimistic Concurrency**: Pengendalian konflik update status order menggunakan Concurrency Token.\n" +
+                      "- **Distributed Tracing**: Pelacakan setiap request dengan Correlation ID (`X-Correlation-Id`).\n\n" +
+                      "*Semua endpoint mengembalikan struktur respons terstandar `ApiResponse<T>`.*"
+    });
+
+    // Masukkan XML comments dari OrderManagement.Api
+    var apiXmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var apiXmlPath = Path.Combine(AppContext.BaseDirectory, apiXmlFile);
+    if (File.Exists(apiXmlPath))
+    {
+        c.IncludeXmlComments(apiXmlPath, includeControllerXmlComments: true);
+    }
+
+    // Masukkan XML comments dari OrderManagement.Application
+    var appXmlPath = Path.Combine(AppContext.BaseDirectory, "OrderManagement.Application.xml");
+    if (File.Exists(appXmlPath))
+    {
+        c.IncludeXmlComments(appXmlPath);
+    }
+});
 
 var app = builder.Build();
 
@@ -69,16 +100,21 @@ using (var scope = app.Services.CreateScope())
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-// Configure HTTP pipeline
-if (app.Environment.IsDevelopment())
+// Configure HTTP pipeline - Swagger UI & OpenAPI
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Order Management API v1");
-        c.RoutePrefix = string.Empty; // Open Swagger at root URL
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Order Management API v1");
+    c.RoutePrefix = "swagger"; // Standard Swagger UI URL: http://localhost:<port>/swagger
+    c.DocumentTitle = "Order Management API Documentation";
+    c.DisplayRequestDuration();
+    c.EnableFilter();
+    c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.List);
+    c.DefaultModelsExpandDepth(1);
+});
+
+// Otomatis redirect dari root "/" ke "/swagger"
+app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.UseHttpsRedirection();
 app.UseAuthorization();

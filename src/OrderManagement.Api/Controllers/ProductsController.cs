@@ -24,8 +24,9 @@ public class ProductsController : ControllerBase
         HttpContext.Items["CorrelationId"]?.ToString() ?? HttpContext.TraceIdentifier;
 
     /// <summary>
-    /// Gets all products and their current stock levels.
+    /// Mengambil semua daftar master produk beserta jumlah sisa stok saat ini.
     /// </summary>
+    /// <param name="cancellationToken">Cancellation token pembatalan request.</param>
     [HttpGet]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<ProductResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
@@ -35,8 +36,10 @@ public class ProductsController : ControllerBase
     }
 
     /// <summary>
-    /// Gets a single product by ID.
+    /// Mengambil detail satu produk berdasarkan Product ID.
     /// </summary>
+    /// <param name="id">ID unik (GUID) dari produk.</param>
+    /// <param name="cancellationToken">Cancellation token pembatalan request.</param>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse<ProductResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
@@ -47,8 +50,10 @@ public class ProductsController : ControllerBase
     }
 
     /// <summary>
-    /// Creates a new product.
+    /// Membuat master produk baru beserta alokasi stok awal dan harga.
     /// </summary>
+    /// <param name="request">Data produk baru (Nama, StockQuantity, Price).</param>
+    /// <param name="cancellationToken">Cancellation token pembatalan request.</param>
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<ProductResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
